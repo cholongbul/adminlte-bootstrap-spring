@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AdminLTE 3 | ChartJS</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+</head>
+<body class="hold-transition layout-top-nav vh-100">
+<div class="wrapper">
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>AdminLTE</h1>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content" style="height: calc(100vh - 130px)">
+            <div class="container-fluid">
+                <div class="col-md-12">
+                    <!-- AREA CHART -->
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title" id="barOrMix-title">Area Chart</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart interval-chart">
+                                <canvas id="barOrMixChart"
+                                        style="height: calc(100vh - 180px); width:100vw"></canvas>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+
+
+                </div>
+                <!-- /.card -->
+
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <footer class="main-footer">
+        <strong>Copyright &copy; 2022 <a href="http://cnkplus.com/">CNKPlus.com</a></strong>
+    </footer>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery -->
+<script src="plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- ChartJS -->
+<script src="plugins/chart.js/Chart.min.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<!-- Page specific script -->
+<script>
+    $(function () {
+        /* ChartJS
+     * -------
+     * Here we will create a few charts using ChartJS
+     */
+        // 변수선언
+        let reqcnt = 0 //요청 파라미터
+        let header_height = document.getElementsByClassName('content-header')[0].offsetHeight;
+        let footer_height = document.getElementsByClassName('main-footer')[0].offsetHeight;
+        let card_header_height = document.getElementsByClassName('card-header')[0].offsetHeight;
+        getXmlData(); //화면 로딩 데이터
+        var interval = setInterval(getXmlData, 10000); // 반복 요청 데이터
+
+        //--------------
+        //- AREA CHART -
+        //--------------
+
+
+        // Get context with jQuery - using jQuery's .get() method.
+        var areaChartCanvas = $('#areaChart').get(0).getContext('2d')
+
+        var areaChartData = {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            datasets: [
+                {
+                    label: 'Digital Goods',
+                    backgroundColor: 'rgba(60,141,188,0.9)',
+                    borderColor: 'rgba(60,141,188,0.8)',
+                    pointRadius: false,
+                    pointColor: '#3b8bba',
+                    pointStrokeColor: 'rgba(60,141,188,1)',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(60,141,188,1)',
+                    data: [28, 48, 40, 19, 86, 27, 90]
+                },
+                {
+                    label: 'Electronics',
+                    backgroundColor: 'rgba(210, 214, 222, 1)',
+                    borderColor: 'rgba(210, 214, 222, 1)',
+                    pointRadius: false,
+                    pointColor: 'rgba(210, 214, 222, 1)',
+                    pointStrokeColor: '#c1c7d1',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(220,220,220,1)',
+                    data: [65, 59, 80, 81, 56, 55, 40]
+                },
+            ]
+        }
+
+        var areaChartOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+            legend: {
+                display: false
+            },
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        display: false,
+                    }
+                }],
+                yAxes: [{
+                    gridLines: {
+                        display: false,
+                    }
+                }]
+            }
+        }
+
+        // This will get the first returned node in the jQuery collection.
+        new Chart(areaChartCanvas, {
+            type: 'line',
+            data: areaChartData,
+            options: areaChartOptions
+        })
+
+        //-------------
+        //- LINE CHART -
+        //--------------
+        var lineChartCanvas = $('#lineChart').get(0).getContext('2d')
+        var lineChartOptions = $.extend(true, {}, areaChartOptions)
+        var lineChartData = $.extend(true, {}, areaChartData)
+        lineChartData.datasets[0].fill = false;
+        lineChartData.datasets[1].fill = false;
+        lineChartOptions.datasetFill = false;
+
+
+        var lineChart = new Chart(lineChartCanvas, {
+            type: 'line',
+            data: lineChartData,
+            options: lineChartOptions
+        })
+
+        //-------------
+        //- DONUT CHART -
+        //-------------
+        // Get context with jQuery - using jQuery's .get() method.
+        var donutChartCanvas = $('#donutChart').get(0).getContext('2d')
+        var donutData = {
+            labels: [
+                'Chrome',
+                'IE',
+                'FireFox',
+                'Safari',
+                'Opera',
+                'Navigator',
+            ],
+            datasets: [
+                {
+                    data: [700, 500, 400, 600, 300, 100],
+                    backgroundColor: ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
+                }
+            ]
+        }
+        var donutOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+        }
+        //Create pie or douhnut chart
+        // You can switch between pie and douhnut using the method below.
+        new Chart(donutChartCanvas, {
+            type: 'doughnut',
+            data: donutData,
+            options: donutOptions
+        })
+
+        //-------------
+        //- PIE CHART -
+        //-------------
+        // Get context with jQuery - using jQuery's .get() method.
+        var pieChartCanvas = $('#pieChart').get(0).getContext('2d')
+        var pieData = donutData;
+        var pieOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+        }
+        //Create pie or douhnut chart
+        // You can switch between pie and douhnut using the method below.
+        new Chart(pieChartCanvas, {
+            type: 'pie',
+            data: pieData,
+            options: pieOptions
+        })
+
+        //-------------
+        //- BAR CHART -
+        //-------------
+        var barChartCanvas = $('#barChart').get(0).getContext('2d')
+        var barChartData = $.extend(true, {}, areaChartData)
+        var temp0 = areaChartData.datasets[0]
+        var temp1 = areaChartData.datasets[1]
+        barChartData.datasets[0] = temp1
+        barChartData.datasets[1] = temp0
+
+        var barChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            datasetFill: false
+        }
+
+        new Chart(barChartCanvas, {
+            type: 'bar',
+            data: barChartData,
+            options: barChartOptions
+        })
+
+        //---------------------
+        //- STACKED BAR CHART -
+        //---------------------
+        var stackedBarChartCanvas = $('#stackedBarChart').get(0).getContext('2d')
+        var stackedBarChartData = $.extend(true, {}, barChartData)
+
+        var stackedBarChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                }],
+                yAxes: [{
+                    stacked: true
+                }]
+            }
+        }
+
+        new Chart(stackedBarChartCanvas, {
+            type: 'bar',
+            data: stackedBarChartData,
+            options: stackedBarChartOptions
+        })
+        // 추가 작성
+
+
+        //ajax xmldata 요청
+        function getXmlData() {
+            $.ajax({
+                type: "GET",
+                url: "getData.do?page=" + reqcnt, //요청변수에 따른 반환 데이터 변경
+                dataType: "xml",
+                //ajax요청
+                success: handleData,
+                error: function(request, status, error){
+                    console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                    clearInterval(interval);
+                }
+            });
+        };
+
+        //xml데이터 처리
+        function handleData(xml, textStatus, response) {
+            //xml변수선언
+            let xmlcnt = response.getResponseHeader("xmlcnt");
+            let parsingXml = parserXml(xml);
+            let label2d = parsingXml[0];
+            let data2d = parsingXml[1];
+            let datanamelist = parsingXml[2];
+            let chartname = parsingXml[3];
+            let chart_height = screen.height - header_height - footer_height - card_header_height - 60; //반응형 차트 높이
+            console.log("높이:" + chart_height);
+            console.log("높이:" + header_height);
+            console.log("높이:" + footer_height);
+            console.log("높이:" + card_header_height);
+            //메소드
+            $("#barOrMix-title").text(chartname) //차트 제목 변경
+            $(".interval-chart").html('</div><canvas id="barOrMixChart" style="width:100vw"></canvas>'); //새로운 그래프 리셋
+            $("#barOrMixChart").css('height', chart_height + 'px'); //차트 높이 설정
+            if (datanamelist.length == 1) {
+                let data = setdata(label2d, data2d, datanamelist);
+                let option = setOptions();
+                createBarChart(data, option); //막대 차트 적용
+            } else if (reqcnt == 0) {
+                let data = setmultidata(label2d, data2d, datanamelist);
+                let option = setOptions();
+                createMultiLineChart(data, option); //멀티 라인 차트 적용
+            } else {
+                let data = setmultiLineBarData(label2d, data2d, datanamelist);
+                let option = setmultiLineBarOption();
+                createLineBarChart(data, option); //데이터명 적용
+            }
+
+            if (reqcnt + 1 == xmlcnt) {
+                reqcnt = 0;
+            } else {
+                reqcnt++
+            }
+
+        }
+
+        //xml파싱, 변수 추출
+        function parserXml(xml) {
+            let datanamelist = [];
+            let label2d = [];
+            let data2d = [];
+            let chartname;
+            let result = []
+            // xml파싱
+            $(xml).find("chart").each(function () {
+                chartname = $(this).find("chartname").text();
+
+                $(this).find("dataset").each(function (i) {
+                    let labellist = [];
+                    let datalist = [];
+                    datanamelist.push($(this).find("dataname").text());
+                    $(this).find("item").each(function (i) {
+                        datalist.push($(this).find("data").text());
+                        labellist.push($(this).find("label").text());
+                    });
+                    label2d.push(labellist);
+                    data2d.push(datalist);
+                });
+            });
+
+
+            console.log(datanamelist);
+            console.log(label2d[0]);
+            console.log(data2d[0]);
+
+            result.push(label2d);
+            result.push(data2d);
+            result.push(datanamelist);
+            result.push(chartname);
+            return result;
+        };
+
+        //데이터세팅
+        function setdata(label2d, data2d, datanamelist) {
+            let data = {
+                labels: label2d[0],
+                datasets: [{
+                    label: datanamelist[0],
+                    data: data2d[0],
+                    backgroundColor: 'rgba(60,141,188,0.9)',
+                    borderColor: 'rgba(60,141,188,0.8)',
+                    pointRadius: false,
+                    pointColor: '#3b8bba',
+                    pointStrokeColor: 'rgba(60,141,188,1)',
+                    pointHighlightFill: '#fff',
+                    pointHighlightStroke: 'rgba(60,141,188,1)',
+                }]
+            };
+
+            return data;
+        };
+
+        function setmultidata(label2d, data2d, datanamelist) {
+            let data = {
+                labels: label2d[0],
+                datasets: [
+                    {
+                        label: datanamelist[1],
+                        backgroundColor: 'rgba(60,141,188,0.9)',
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        pointRadius: false,
+                        pointColor: '#3b8bba',
+                        pointStrokeColor: 'rgba(60,141,188,1)',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
+                        data: data2d[1]
+                    },
+                    {
+                        label: datanamelist[0],
+                        backgroundColor: 'rgba(210, 214, 222, 1)',
+                        borderColor: 'rgba(210, 214, 222, 1)',
+                        pointRadius: false,
+                        pointColor: 'rgba(210, 214, 222, 1)',
+                        pointStrokeColor: '#c1c7d1',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(220,220,220,1)',
+                        data: data2d[0]
+                    },
+                ]
+            }
+
+            return data;
+        };
+
+        function setmultiLineBarData(label2d, data2d, datanamelist) {
+            data = {
+                labels: label2d[0],
+                datasets: [
+                    {
+                        type: 'line',
+                        label: datanamelist[0],
+                        data: data2d[0],
+                        xAxisID: 'turn-x',
+                        yAxisID: 'turn-y',
+                        backgroundColor: '#f39c12',
+                        borderColor: '#f39c12',
+                        pointRadius: 10,
+                        pointColor: 'rgba(210, 214, 222, 1)',
+                        pointStrokeColor: '#c1c7d1',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(220,220,220,1)',
+                        fill: false
+
+                    },
+                    {
+                        type: 'bar',
+                        label: datanamelist[1],
+                        data: data2d[1],
+                        backgroundColor: 'rgba(60,141,188,0.7)',
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        pointRadius: false,
+                        pointColor: '#3b8bba',
+                        pointStrokeColor: 'rgba(60,141,188,1)',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
+                        fill: false
+                    }
+                ]
+            }
+            return data;
+        };
+
+        //옵션세팅
+        function setmultiLineBarOption() {
+            var option = {
+                maintainAspectRatio: false,
+
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        stacked: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'value-y'
+                        },
+                        ticks: {
+                            beginAtZero: true
+                        },
+                        gridLines: {
+                            color: "rgba(204, 204, 204,0.1)"
+                        }
+                    }, {
+                        id: 'turn-y',
+                        display: false,
+                        scaleLabel: {
+                            display: false,
+                            labelString: "proportion"
+                        },
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                    xAxes: [{
+                        display: true,
+                        stacked: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'value-x'
+                        },
+                        gridLines: {
+                            color: "rgba(204, 204, 204,0.1)"
+                        }
+                    }, {
+                        id: 'turn-x',
+                        offset: true,
+                        display: false,
+                        stacked: false,
+                        scaleLabel: {
+                            display: false,
+                            labelString: 'turn-x'
+                        }
+
+                    }]
+                },
+                legend: {
+                    display: true
+                }
+            };
+
+            return option;
+        };
+
+        function setOptions() {
+            let option = {
+                maintainAspectRatio: false,
+                legend: {
+                    display: true
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                        }
+                    }]
+                }
+            };
+
+            return option;
+
+        };
+
+
+        //차트 생성
+        function createBarChart(data, options) {
+            var barChartCanvas = $("#barOrMixChart").get(0).getContext("2d");
+
+            // This will get the first returned node in the jQuery collection.
+            var barChart = new Chart(barChartCanvas, {
+                type: 'bar',
+                data: data,
+                options: options
+            });
+        };
+
+        function createMultiLineChart(data, options) {
+            var multiLineCanvas = $("#barOrMixChart").get(0).getContext("2d");
+            var lineChart = new Chart(multiLineCanvas, {
+                type: 'line',
+                data: data,
+                options: options
+            });
+        };
+
+        function createLineBarChart(data, options) {
+
+            var multiLineCanvas = $("#barOrMixChart").get(0).getContext("2d");
+            var lineChart = new Chart(multiLineCanvas, {
+                type: 'bar',
+                data: data,
+                options: options
+            });
+        }
+
+    });
+</script>
+</body>
+</html>
