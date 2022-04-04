@@ -79,7 +79,7 @@
      * Here we will create a few charts using ChartJS
      */
         // 변수선언
-        const chartname = ["delivery","revenue","stock"]
+        const chartnamelist = ["delivery","revenue","stock"]
         let reqcnt = 0 //요청 파라미터
         let header_height = document.getElementsByClassName('content-header')[0].offsetHeight;
         let footer_height = document.getElementsByClassName('main-footer')[0].offsetHeight;
@@ -271,7 +271,7 @@
         function getXmlData() {
             $.ajax({
                 type: "GET",
-                url: "getData.do?chartname=" + chartname[reqcnt], //요청변수에 따른 반환 데이터 변경
+                url: "getData.do?chartname=" + chartnamelist[reqcnt], //요청변수에 따른 반환 데이터 변경
                 dataType: "xml",
                 //ajax요청
                 success: handleData,
@@ -300,15 +300,18 @@
             $("#barOrMix-title").text(chartname) //차트 제목 변경
             $(".interval-chart").html('</div><canvas id="barOrMixChart" style="width:100vw"></canvas>'); //새로운 그래프 리셋
             $("#barOrMixChart").css('height', chart_height + 'px'); //차트 높이 설정
-            if (chartname[reqcnt] == "delivery") {
+            console.log(chartnamelist[reqcnt])
+            if (chartnamelist[reqcnt] == "revenue") {
                 let data = setdata(label2d, data2d, datanamelist);
                 let option = setOptions();
                 createBarChart(data, option); //막대 차트 적용
-            } else if (chartname[reqcnt] == "stock") {
+            } else
+                if (chartnamelist[reqcnt] == "delivery") {
                 let data = setmultidata(label2d, data2d, datanamelist);
                 let option = setOptions();
                 createMultiLineChart(data, option); //멀티 라인 차트 적용
-            } else {
+            }
+            if(chartnamelist[reqcnt] == "stock") {
                 let data = setmultiLineBarData(label2d, data2d, datanamelist);
                 let option = setmultiLineBarOption();
                 createLineBarChart(data, option); //데이터명 적용
