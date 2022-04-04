@@ -1,4 +1,4 @@
-package com.jmoh.adminlte.apigetter;
+package com.jmoh.adminlte.util;
 
 import org.w3c.dom.Document;
 
@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.StringWriter;
 
 public class XmlChanger {
+
     public static Document convertXMLFileToXMLDocument(String filePath)
     {
         //Parser that produces DOM object trees from XML content

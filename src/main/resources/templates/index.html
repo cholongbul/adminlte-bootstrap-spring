@@ -79,6 +79,7 @@
      * Here we will create a few charts using ChartJS
      */
         // 변수선언
+        const chartname = ["delivery","revenue","stock"]
         let reqcnt = 0 //요청 파라미터
         let header_height = document.getElementsByClassName('content-header')[0].offsetHeight;
         let footer_height = document.getElementsByClassName('main-footer')[0].offsetHeight;
@@ -270,7 +271,7 @@
         function getXmlData() {
             $.ajax({
                 type: "GET",
-                url: "getData.do?page=" + reqcnt, //요청변수에 따른 반환 데이터 변경
+                url: "getData.do?chartname=" + chartname[reqcnt], //요청변수에 따른 반환 데이터 변경
                 dataType: "xml",
                 //ajax요청
                 success: handleData,
@@ -299,11 +300,11 @@
             $("#barOrMix-title").text(chartname) //차트 제목 변경
             $(".interval-chart").html('</div><canvas id="barOrMixChart" style="width:100vw"></canvas>'); //새로운 그래프 리셋
             $("#barOrMixChart").css('height', chart_height + 'px'); //차트 높이 설정
-            if (datanamelist.length == 1) {
+            if (chartname[reqcnt] == "delivery") {
                 let data = setdata(label2d, data2d, datanamelist);
                 let option = setOptions();
                 createBarChart(data, option); //막대 차트 적용
-            } else if (reqcnt == 0) {
+            } else if (chartname[reqcnt] == "stock") {
                 let data = setmultidata(label2d, data2d, datanamelist);
                 let option = setOptions();
                 createMultiLineChart(data, option); //멀티 라인 차트 적용
@@ -447,7 +448,7 @@
             return data;
         };
 
-        //옵션세팅
+        //---------------------옵션세팅----------------------------------------------
         function setmultiLineBarOption() {
             var option = {
                 maintainAspectRatio: false,
@@ -458,7 +459,8 @@
                         stacked: true,
                         scaleLabel: {
                             display: true,
-                            labelString: 'value-y'
+                            labelString: 'value',
+                            fontColor: 'rgba(60,141,188,0.7)'
                         },
                         ticks: {
                             beginAtZero: true
@@ -468,10 +470,11 @@
                         }
                     }, {
                         id: 'turn-y',
-                        display: false,
+                        display: true,
                         scaleLabel: {
-                            display: false,
-                            labelString: "proportion"
+                            display: true,
+                            labelString: "turn",
+                            fontColor: '#f39c12'
                         },
                         ticks: {
                             beginAtZero: true
@@ -512,18 +515,6 @@
                 maintainAspectRatio: false,
                 legend: {
                     display: true
-                },
-                scales: {
-                    xAxes: [{
-                        gridLines: {
-                            display: false,
-                        }
-                    }],
-                    yAxes: [{
-                        gridLines: {
-                            display: false,
-                        }
-                    }]
                 }
             };
 
@@ -532,7 +523,7 @@
         };
 
 
-        //차트 생성
+        //-----------------------------------차트 생성------------------------------------------
         function createBarChart(data, options) {
             var barChartCanvas = $("#barOrMixChart").get(0).getContext("2d");
 
