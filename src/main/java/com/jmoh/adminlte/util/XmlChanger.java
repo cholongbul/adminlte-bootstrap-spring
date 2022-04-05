@@ -14,7 +14,7 @@ import java.io.StringWriter;
 
 public class XmlChanger {
 
-    public static Document convertXMLFileToXMLDocument(String filePath)
+    public static Document convertXMLFileToXMLDocument(File file)
     {
         //Parser that produces DOM object trees from XML content
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -27,7 +27,7 @@ public class XmlChanger {
             builder = factory.newDocumentBuilder();
 
             //Parse the content to Document object
-            Document xmlDocument = builder.parse(new File(filePath));
+            Document xmlDocument = builder.parse(file);
 
             return xmlDocument;
         }
